@@ -16,15 +16,13 @@ var contributorsOptions = {
   url: url,
   method: 'GET',
   headers: {
-    'Accept': 'application/json',
     'Accept-Charset': 'utf-8',
     'User-Agent': 'myGitHub app'
   }
 };
 
 function getContributors(options, callback) {
-  request
-  .get(options, function (error, response, body) {
+  request(options, function (error, response, body) {
     console.log(`Connecting to Github...`);
     console.log(`Response: ${response.statusCode} ${response.statusMessage}`);
     if (!error && response.statusCode === 200) {
@@ -56,8 +54,8 @@ function getAvatar(login, url){
       }
       fileName = `./avatars/${login}${ext}`;
       console.log(`Saving to: ${fileName}`);
-      //fs.createWriteStream(fileName, response.body);
-    }).pipe(fs.createWriteStream('./avatars/bborncr.png'));
+    })
+    .pipe(fs.createWriteStream(fileName));
 }
 
 getContributors(contributorsOptions, function (body) {
