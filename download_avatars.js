@@ -36,14 +36,6 @@ function getContributors(options, callback) {
   });
 }
 
-function setFileName(fn){
-  fileName = fn;
-}
-
-function getFilename(){
-  return fileName;
-}
-
 function getAvatar(login, url){
 
   var avatarOptions = {
