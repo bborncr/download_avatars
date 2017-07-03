@@ -1,5 +1,3 @@
-// github.com API URL https://api.github.com/repos/bborncr/nextion/contributors
-// Returns array of objects: login, avatar_url
 var fs = require('fs');
 var request = require('request');
 var config = require('./config/credentials');
@@ -25,7 +23,8 @@ var contributorsOptions = {
 };
 
 function getContributors(options, callback) {
-  request(options, function (error, response, body) {
+  request
+  .get(options, function (error, response, body) {
     console.log(`Connecting to Github...`);
     console.log(`Response: ${response.statusCode} ${response.statusMessage}`);
     if (!error && response.statusCode === 200) {
@@ -48,28 +47,19 @@ function getAvatar(login, url){
 
   request(avatarOptions)
     .on('response', function(response) {
-      // console.log(response.statusCode);
-      // console.log(response.statusMessage);
-      // console.log(response.headers['content-type']);
       if(response.headers['content-type'] === 'image/jpeg'){
         ext = '.jpg';
-      }
-      if(response.headers['content-type'] === 'image/png'){
+      } else if(response.headers['content-type'] === 'image/png'){
         ext = '.png';
-      }
-      if(response.headers['content-type'] === 'image/gif'){
+      } else if(response.headers['content-type'] === 'image/gif'){
         ext = '.gif';
       }
-    })
-    .on('end', function(){
       fileName = `./avatars/${login}${ext}`;
       console.log(`Saving to: ${fileName}`);
-      fs.createWriteStream(fileName);
-    });
-
+      //fs.createWriteStream(fileName, response.body);
+    }).pipe(fs.createWriteStream('./avatars/bborncr.png'));
 }
 
-//.pipe(fs.createWriteStream(filename);
 getContributors(contributorsOptions, function (body) {
   console.log(`Successfully retrieved contributors from Github`);
   contributors = JSON.parse(body);
