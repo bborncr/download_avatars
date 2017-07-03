@@ -2,15 +2,15 @@
 // Returns array of objects: login, avatar_url
 var fs = require('fs');
 var request = require('request');
+var config = require('./config/credentials');
 
 var args = process.argv.slice(2);
 var user = args[0];
 var repo = args[1];
 var contributors = {};
-var contributorLogin = "";
-var avatarUrl = "";
-var filename = "";
-
+var contributorLogin = '';
+var avatarUrl = '';
+var fileName = '';
 var url = `https://api.github.com/repos/${user}/${repo}/contributors`;
 
 var contributorsOptions = {
@@ -45,13 +45,33 @@ function getAvatar(login, url){
     }
   };
 
-  filename = `./avatars/${contributorLogin}.png`;
-  console.log(`Saving to: ${filename}`);
-  request(avatarOptions).pipe(fs.createWriteStream(filename));
+  request(avatarOptions)
+    .on('response', function(response) {
+      // console.log(response.statusCode);
+      // console.log(response.statusMessage);
+      // console.log(response.headers['content-type']);
+      var ext = '.png';
+      if(response.headers['content-type'] === 'image/jpeg'){
+        ext = '.jpg';
+      }
+      if(response.headers['content-type'] === 'image/png'){
+        ext = '.png';
+      }
+      if(response.headers['content-type'] === 'image/gif'){
+        ext = '.gif';
+      }
+    })
+    .on('end', function(){
+      fileName = `./avatars/${login}${ext}`;
+      console.log(`Saving to: ${fileName}`);
+    })
+    .pipe(fs.createWriteStream(fileName));
+
 }
 
+//.pipe(fs.createWriteStream(filename);
 getContributors(contributorsOptions, function (body) {
-  console.log(`Successfully retrieved data from Github`);
+  console.log(`Successfully retrieved contributors from Github`);
   contributors = JSON.parse(body);
   console.log(`Found ${contributors.length} contributors`);
   for (var contrib in contributors){
@@ -60,11 +80,3 @@ getContributors(contributorsOptions, function (body) {
     getAvatar(contributorLogin, avatarUrl);
   }
 });
-
-var avatarOptions = {
-  url: url,
-  method: 'GET',
-  headers: {
-    'User-Agent': 'myGitHub app'
-  }
-};
