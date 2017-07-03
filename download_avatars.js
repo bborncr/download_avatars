@@ -11,6 +11,7 @@ var contributors = {};
 var contributorLogin = '';
 var avatarUrl = '';
 var fileName = '';
+var ext = '';
 var url = `https://api.github.com/repos/${user}/${repo}/contributors`;
 
 var contributorsOptions = {
@@ -50,7 +51,6 @@ function getAvatar(login, url){
       // console.log(response.statusCode);
       // console.log(response.statusMessage);
       // console.log(response.headers['content-type']);
-      var ext = '.png';
       if(response.headers['content-type'] === 'image/jpeg'){
         ext = '.jpg';
       }
@@ -64,8 +64,8 @@ function getAvatar(login, url){
     .on('end', function(){
       fileName = `./avatars/${login}${ext}`;
       console.log(`Saving to: ${fileName}`);
-    })
-    .pipe(fs.createWriteStream(fileName));
+      fs.createWriteStream(fileName);
+    });
 
 }
 
