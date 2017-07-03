@@ -8,21 +8,24 @@ var repo = args[1];
 var contributors = {};
 var contributorLogin = '';
 var avatarUrl = '';
-var fileName = '';
+var fileName = './avatars/hardcoded.png';
 var ext = '';
+var buffer = '';
 var url = `https://api.github.com/repos/${user}/${repo}/contributors`;
 
 var contributorsOptions = {
   url: url,
   method: 'GET',
   headers: {
-    'Accept-Charset': 'utf-8',
     'User-Agent': 'myGitHub app'
-  }
+  },
+  qs: {
+      access_token: config.token
+    }
 };
 
 function getContributors(options, callback) {
-  request(options, function (error, response, body) {
+  request(options, (error, response, body) => {
     console.log(`Connecting to Github...`);
     console.log(`Response: ${response.statusCode} ${response.statusMessage}`);
     if (!error && response.statusCode === 200) {
@@ -33,6 +36,14 @@ function getContributors(options, callback) {
   });
 }
 
+function setFileName(fn){
+  fileName = fn;
+}
+
+function getFilename(){
+  return fileName;
+}
+
 function getAvatar(login, url){
 
   var avatarOptions = {
@@ -40,11 +51,14 @@ function getAvatar(login, url){
     method: 'GET',
     headers: {
       'User-Agent': 'myGitHub app'
+    },
+    qs: {
+      access_token: config.token
     }
   };
-
-  request(avatarOptions)
-    .on('response', function(response) {
+  var newFile = './avatars/hardcoded.png';
+  var req = request(avatarOptions)
+    .on('response', (response) => {
       if(response.headers['content-type'] === 'image/jpeg'){
         ext = '.jpg';
       } else if(response.headers['content-type'] === 'image/png'){
@@ -52,13 +66,14 @@ function getAvatar(login, url){
       } else if(response.headers['content-type'] === 'image/gif'){
         ext = '.gif';
       }
-      fileName = `./avatars/${login}${ext}`;
-      console.log(`Saving to: ${fileName}`);
-    })
-    .pipe(fs.createWriteStream(fileName));
+
+      newFile = `./avatars/${login}${ext}`;
+      console.log(`Saving file to: ${newFile}`);
+      req.pipe(fs.createWriteStream(newFile));
+    });
 }
 
-getContributors(contributorsOptions, function (body) {
+getContributors(contributorsOptions, (body) => {
   console.log(`Successfully retrieved contributors from Github`);
   contributors = JSON.parse(body);
   console.log(`Found ${contributors.length} contributors`);
