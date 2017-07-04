@@ -1,6 +1,6 @@
 var fs = require('fs');
 var request = require('request');
-var config = require('./config/credentials');
+require('dotenv').config();
 
 var args = process.argv.slice(2);
 var user = args[0];
@@ -23,7 +23,7 @@ var contributorsOptions = {
     'User-Agent': 'myGitHub app'
   },
   qs: {
-    access_token: config.token
+    access_token: process.env.GITHUB_TOKEN
   }
 };
 
@@ -48,10 +48,9 @@ function getAvatar(login, url){
       'User-Agent': 'myGitHub app'
     },
     qs: {
-      access_token: config.token
+      access_token: process.env.GITHUB_TOKEN
     }
   };
-  var newFile = '';
   var req = request(avatarOptions)
     .on('response', (response) => {
       if(response.headers['content-type'] === 'image/jpeg'){
@@ -61,7 +60,7 @@ function getAvatar(login, url){
       } else if(response.headers['content-type'] === 'image/gif'){
         ext = '.gif';
       }
-      newFile = `./avatars/${login}${ext}`;
+      var newFile = `./avatars/${login}${ext}`;
       console.log(`Saving file to: ${newFile}`);
       req.pipe(fs.createWriteStream(newFile));
     });
