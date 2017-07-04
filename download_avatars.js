@@ -9,7 +9,6 @@ var contributors = {};
 var contributorLogin = '';
 var avatarUrl = '';
 var ext = '';
-var buffer = '';
 var url = `https://api.github.com/repos/${user}/${repo}/contributors`;
 
 if(user === null || repo === null){
