@@ -12,7 +12,7 @@ var ext = '';
 var buffer = '';
 var url = `https://api.github.com/repos/${user}/${repo}/contributors`;
 
-if(user == null || repo == null){
+if(user === null || repo === null){
   console.log("Usage: node download_avatars.js <user> <repo>");
   process.exit(1);
 }
@@ -24,8 +24,8 @@ var contributorsOptions = {
     'User-Agent': 'myGitHub app'
   },
   qs: {
-      access_token: config.token
-    }
+    access_token: config.token
+  }
 };
 
 function getContributors(options, callback) {
