@@ -8,10 +8,14 @@ var repo = args[1];
 var contributors = {};
 var contributorLogin = '';
 var avatarUrl = '';
-var fileName = './avatars/hardcoded.png';
 var ext = '';
 var buffer = '';
 var url = `https://api.github.com/repos/${user}/${repo}/contributors`;
+
+if(user == null || repo == null){
+  console.log("Usage: node download_avatars.js <user> <repo>");
+  process.exit(1);
+}
 
 var contributorsOptions = {
   url: url,
@@ -48,7 +52,7 @@ function getAvatar(login, url){
       access_token: config.token
     }
   };
-  var newFile = './avatars/hardcoded.png';
+  var newFile = '';
   var req = request(avatarOptions)
     .on('response', (response) => {
       if(response.headers['content-type'] === 'image/jpeg'){
@@ -58,7 +62,6 @@ function getAvatar(login, url){
       } else if(response.headers['content-type'] === 'image/gif'){
         ext = '.gif';
       }
-
       newFile = `./avatars/${login}${ext}`;
       console.log(`Saving file to: ${newFile}`);
       req.pipe(fs.createWriteStream(newFile));
